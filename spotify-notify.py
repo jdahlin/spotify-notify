@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # Johan Dahlin 2010
 
+import os
 import sys
 
 import dbus.service
@@ -108,6 +109,18 @@ def checker(sc):
 
 def main():
     DBusGMainLoop(set_as_default=True)
+
+    def on_MediaPlayerKeyPressed(*keys):
+        for key in keys:
+            if key == 'Play':
+                os.system('./spotify_cmd.exe playpause')
+            else:
+                print key
+    bus = dbus.SessionBus()
+    sd = bus.get_object('org.gnome.SettingsDaemon',
+        '/org/gnome/SettingsDaemon/MediaKeys')
+    sd.connect_to_signal("MediaPlayerKeyPressed", on_MediaPlayerKeyPressed)
+
     sc = SongChecker()
     service = MPRISService('/Player', sc)
     sc.service = service
